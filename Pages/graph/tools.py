@@ -14,6 +14,7 @@ import sklearn
 import json
 from datetime import datetime, date
 import numpy as np
+from pydantic import BaseModel
 
 
 repl = PythonREPL()
@@ -87,7 +88,11 @@ for figure in plotly_figures:
         pickle.dump(figure, f)
 """
 
-@tool
+class PythonTaskInput(BaseModel):
+    thought: str = ""
+    python_code: str = ""
+
+@tool(args_schema=PythonTaskInput)
 def complete_python_task(
         thought: str = "", python_code: str = "", graph_state: dict = None, **kwargs
 ) -> Tuple[str, dict]:
