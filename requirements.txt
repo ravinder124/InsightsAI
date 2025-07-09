@@ -10,3 +10,4 @@ numpy
 passlib
 bcrypt
 python-dotenv
+langchain_experimental
