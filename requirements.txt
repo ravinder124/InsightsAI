@@ -1,0 +1,11 @@
+pandas
+streamlit
+langchain-core
+sklearn
+plotly
+langchain
+langgraph
+langchain-openai
+numpy
+passlib
+bcrypt
