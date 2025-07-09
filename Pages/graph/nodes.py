@@ -25,7 +25,11 @@ class ToolExecutor:
                 try:
                     # Only pass the arguments expected by the tool
                     if invocation.tool == "complete_python_task":
-                        allowed_args = {k: v for k, v in invocation.tool_input.items() if k in ["graph_state", "thought", "python_code"]}
+                        # If 'thought' is present, prepend it as a comment to python_code
+                        tool_input = dict(invocation.tool_input)
+                        if "thought" in tool_input and "python_code" in tool_input:
+                            tool_input["python_code"] = f"# Thought: {tool_input['thought']}\n{tool_input['python_code']}"
+                        allowed_args = {k: v for k, v in tool_input.items() if k in ["graph_state", "python_code"]}
                         result = tool_func(**allowed_args)
                     else:
                         result = tool_func(**invocation.tool_input)
