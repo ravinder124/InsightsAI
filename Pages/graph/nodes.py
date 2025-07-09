@@ -141,12 +141,8 @@ def call_tools(state: AgentState):
             # Deep copy to ensure no reference to the original dict
             tool_args = copy.deepcopy(tool_call["args"])
             if tool_name == "complete_python_task":
-                # Only extract python_code, ignore all other keys
-                python_code = tool_args.get("python_code", "")
-                thought = tool_args.get("thought", None)
-                if thought:
-                    python_code = f"# Thought: {thought}\n{python_code}"
-                tool_input = {"python_code": python_code, "graph_state": state}
+                # Pass all tool_args (from LLM) plus graph_state
+                tool_input = {**tool_args, "graph_state": state}
             else:
                 # Remove any unexpected keys for other tools as well
                 allowed_keys = set(["graph_state"]) | set(tool_args.keys())
