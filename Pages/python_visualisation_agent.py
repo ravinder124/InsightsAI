@@ -263,6 +263,8 @@ with col1:
     )
 
     if uploaded_files:
+        # Ensure the upload directory exists
+        os.makedirs(user_upload_dir, exist_ok=True)
         # Save uploaded files and track in session or user folder
         for file in uploaded_files:
             file_path = os.path.join(user_upload_dir, file.name)
