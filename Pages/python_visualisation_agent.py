@@ -314,6 +314,7 @@ with col1:
             st.info(f"[DEBUG] file_path: {repr(file_path)} (type: {type(file_path)})")
             with open(file_path, "wb") as f:
                 f.write(file.getbuffer())
+            st.info(f"[DEBUG] Saved file: {file_path}, exists: {os.path.exists(file_path)}")
             if not username:
                 if safe_filename not in st.session_state['user_files']:
                     st.session_state['user_files'].append(safe_filename)
