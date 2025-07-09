@@ -138,12 +138,16 @@ def call_tools(state: AgentState):
     last_message = state["messages"][-1]
     tool_invocations = []
     if isinstance(last_message, AIMessage) and hasattr(last_message, 'tool_calls'):
-        tool_invocations = [
-            ToolInvocation(
-                tool=tool_call["name"],
-                tool_input={**tool_call["args"], "graph_state": state}
-            ) for tool_call in last_message.tool_calls
-        ]
+        for tool_call in last_message.tool_calls:
+            tool_name = tool_call["name"]
+            tool_args = dict(tool_call["args"])
+            # For complete_python_task, only keep python_code
+            if tool_name == "complete_python_task":
+                filtered_args = {k: v for k, v in tool_args.items() if k == "python_code"}
+            else:
+                filtered_args = tool_args
+            tool_input = {**filtered_args, "graph_state": state}
+            tool_invocations.append(ToolInvocation(tool=tool_name, tool_input=tool_input))
 
     responses = tool_executor.batch(tool_invocations, return_exceptions=True)
     tool_messages = []
