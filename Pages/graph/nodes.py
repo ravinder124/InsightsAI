@@ -25,10 +25,7 @@ class ToolExecutor:
                 try:
                     # Only pass the arguments expected by the tool
                     if invocation.tool == "complete_python_task":
-                        # If 'thought' is present, prepend it as a comment to python_code
-                        tool_input = dict(invocation.tool_input)
-                        if "thought" in tool_input and "python_code" in tool_input:
-                            tool_input["python_code"] = f"# Thought: {tool_input['thought']}\n{tool_input['python_code']}"
+                        tool_input = invocation.tool_input
                         allowed_args = {k: v for k, v in tool_input.items() if k in ["graph_state", "python_code"]}
                         result = tool_func(**allowed_args)
                     else:
@@ -141,9 +138,13 @@ def call_tools(state: AgentState):
         for tool_call in last_message.tool_calls:
             tool_name = tool_call["name"]
             tool_args = dict(tool_call["args"])
-            # For complete_python_task, only keep python_code
+            # For complete_python_task, only keep python_code and graph_state, and prepend thought as a comment if present
             if tool_name == "complete_python_task":
-                filtered_args = {k: v for k, v in tool_args.items() if k == "python_code"}
+                python_code = tool_args.get("python_code", "")
+                thought = tool_args.get("thought", "")
+                if thought:
+                    python_code = f"# Thought: {thought}\n{python_code}"
+                filtered_args = {"python_code": python_code}
             else:
                 filtered_args = tool_args
             tool_input = {**filtered_args, "graph_state": state}
