@@ -227,6 +227,7 @@ else:
 if username:
     user_upload_dir = os.path.join('uploads', username)
     os.makedirs(user_upload_dir, exist_ok=True)
+    st.info(f"[DEBUG] User upload directory: {os.path.abspath(user_upload_dir)}")
     user_data_dict_path = os.path.join(user_upload_dir, 'data_dictionary.json')
     if os.path.exists(user_data_dict_path):
         with open(user_data_dict_path, 'r') as f:
@@ -238,6 +239,8 @@ else:
     if 'user_files' not in st.session_state:
         st.session_state['user_files'] = []
     user_upload_dir = 'uploads'
+    os.makedirs(user_upload_dir, exist_ok=True)
+    st.info(f"[DEBUG] Guest upload directory: {os.path.abspath(user_upload_dir)}")
     user_data_dict_path = 'data_dictionary.json'
     if os.path.exists(user_data_dict_path):
         with open(user_data_dict_path, 'r') as f:
@@ -308,6 +311,8 @@ with col1:
             for tab, filename in zip(file_tabs, selected_files):
                 with tab:
                     try:
+                        # Ensure the upload directory exists before reading
+                        os.makedirs(user_upload_dir, exist_ok=True)
                         df = pd.read_csv(os.path.join(user_upload_dir, filename))
                         
                         # Show basic info
