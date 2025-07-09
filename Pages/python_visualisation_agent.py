@@ -290,21 +290,10 @@ with col1:
             file_path = os.path.join(user_upload_dir, safe_filename)
             if not os.path.exists(user_upload_dir):
                 os.makedirs(user_upload_dir, exist_ok=True)
-            if not os.path.exists(file_path):
-                st.warning(f"File {safe_filename} not found on disk. Please re-upload.")
-                st.session_state['user_files'] = []
-                st.rerun()
-
-    if uploaded_files:
-        # Ensure the upload directory exists
-        os.makedirs(user_upload_dir, exist_ok=True)
-        # Save uploaded files and track in session or user folder
-        for file in uploaded_files:
-            # Sanitize filename to prevent path traversal or invalid characters
-            safe_filename = re.sub(r'[^A-Za-z0-9_.-]', '_', file.name)
-            file_path = os.path.join(user_upload_dir, safe_filename)
+            # Always save the file before checking existence
             with open(file_path, "wb") as f:
                 f.write(file.getbuffer())
+            # No need to check for existence or warn here; file is now saved
             if not username:
                 if safe_filename not in st.session_state['user_files']:
                     st.session_state['user_files'].append(safe_filename)
