@@ -231,7 +231,6 @@ else:
 if username:
     user_upload_dir = os.path.join('uploads', username)
     os.makedirs(user_upload_dir, exist_ok=True)
-    st.info(f"[DEBUG] User upload directory: {os.path.abspath(user_upload_dir)}")
     user_data_dict_path = os.path.join(user_upload_dir, 'data_dictionary.json')
     if os.path.exists(user_data_dict_path):
         with open(user_data_dict_path, 'r') as f:
@@ -244,7 +243,6 @@ else:
         st.session_state['user_files'] = []
     user_upload_dir = 'uploads'
     os.makedirs(user_upload_dir, exist_ok=True)
-    st.info(f"[DEBUG] Guest upload directory: {os.path.abspath(user_upload_dir)}")
     user_data_dict_path = 'data_dictionary.json'
     if os.path.exists(user_data_dict_path):
         with open(user_data_dict_path, 'r') as f:
@@ -264,18 +262,17 @@ with col1:
     # Ensure user_upload_dir exists before session cleanup
     if not os.path.exists(user_upload_dir):
         os.makedirs(user_upload_dir, exist_ok=True)
-    st.info(f"[DEBUG] user_upload_dir before session cleanup: {user_upload_dir}")
     # Clean up session state for uploaded files that no longer exist
     if 'user_files' in st.session_state:
         cleaned_files = []
         for fname in st.session_state['user_files']:
             fpath = os.path.join(user_upload_dir, fname)
-            st.info(f"[DEBUG] Checking file: {fpath}")
             if os.path.exists(fpath):
                 cleaned_files.append(fname)
             else:
-                st.info(f"[DEBUG] File does not exist: {fpath}")
-        st.session_state['user_files'] = cleaned_files
+                st.warning(f"File {fname} not found on disk. Please re-upload.")
+                st.session_state['user_files'] = []
+                st.rerun()
 
     # File upload section
     uploaded_files = st.file_uploader(
@@ -301,20 +298,13 @@ with col1:
     if uploaded_files:
         # Ensure the upload directory exists
         os.makedirs(user_upload_dir, exist_ok=True)
-        st.info(f"[DEBUG] user_upload_dir: {repr(user_upload_dir)} (type: {type(user_upload_dir)})")
-        st.info(f"[DEBUG] Saving to: {os.path.abspath(user_upload_dir)}")
-        st.info(f"[DEBUG] Directory exists: {os.path.exists(user_upload_dir)}")
         # Save uploaded files and track in session or user folder
         for file in uploaded_files:
-            st.info(f"[DEBUG] file.name: {repr(file.name)} (type: {type(file.name)})")
             # Sanitize filename to prevent path traversal or invalid characters
             safe_filename = re.sub(r'[^A-Za-z0-9_.-]', '_', file.name)
-            st.info(f"[DEBUG] safe_filename: {repr(safe_filename)}")
             file_path = os.path.join(user_upload_dir, safe_filename)
-            st.info(f"[DEBUG] file_path: {repr(file_path)} (type: {type(file_path)})")
             with open(file_path, "wb") as f:
                 f.write(file.getbuffer())
-            st.info(f"[DEBUG] Saved file: {file_path}, exists: {os.path.exists(file_path)}")
             if not username:
                 if safe_filename not in st.session_state['user_files']:
                     st.session_state['user_files'].append(safe_filename)
@@ -327,14 +317,11 @@ with col1:
         except Exception as e:
             files_in_dir = []
             st.warning(f"[DEBUG] Could not list files in {user_upload_dir}: {e}")
-        st.info(f"[DEBUG] Files in {user_upload_dir}: {files_in_dir}")
         available_files = [f for f in files_in_dir if f.endswith('.csv') and os.path.exists(os.path.join(user_upload_dir, f))]
     else:
         # For guests, always include 'sample.csv' if it exists
         guest_files = [f for f in st.session_state['user_files'] if f.endswith('.csv')]
         sample_csv_path = os.path.join('uploads', 'sample.csv')
-        st.info(f"[DEBUG] Checking for sample.csv at: {sample_csv_path}")
-        st.info(f"[DEBUG] sample.csv exists: {os.path.exists(sample_csv_path)}")
         if os.path.exists(sample_csv_path):
             if 'sample.csv' not in guest_files:
                 guest_files.insert(0, 'sample.csv')
