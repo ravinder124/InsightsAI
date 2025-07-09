@@ -327,7 +327,16 @@ with col1:
         if os.path.exists(os.path.join('uploads', 'sample.csv')):
             if 'sample.csv' not in guest_files:
                 guest_files.insert(0, 'sample.csv')
-        available_files = [f for f in guest_files if os.path.exists(os.path.join(user_upload_dir, f))]
+        # Ensure sample.csv is always included if it exists
+        available_files = []
+        for f in guest_files:
+            if f == 'sample.csv':
+                if os.path.exists(os.path.join('uploads', 'sample.csv')):
+                    available_files.append('sample.csv')
+            else:
+                if os.path.exists(os.path.join(user_upload_dir, f)):
+                    available_files.append(f)
+        st.info(f"[DEBUG] Guest available_files: {available_files}")
 
     if available_files:
         # File selection
