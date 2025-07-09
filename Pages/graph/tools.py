@@ -102,6 +102,10 @@ def complete_python_task(
         thought: Internal thought about the next action to be taken, and the reasoning behind it. This should be formatted in MARKDOWN and be high quality.
         python_code: Python code to be executed to perform analyses, create a new dataset or create a visualization.
     """
+    print("=== AI Tool Call ===")
+    print("Thought:", thought)
+    print("Python code to execute:\n", python_code)
+    print("====================")
     current_variables = graph_state.get("current_variables") or {}
     for input_dataset in graph_state["input_data"]:
         # Handle both InputData objects and dictionaries (from serialization)
@@ -136,6 +140,7 @@ def complete_python_task(
 
 
         exec(python_code, exec_globals)
+        print("plotly_figures after code execution:", exec_globals.get("plotly_figures"))
         
         # Clean the persistent variables to ensure they are JSON serializable
         new_persistent_vars = {k: v for k, v in exec_globals.items() if k not in globals()}
