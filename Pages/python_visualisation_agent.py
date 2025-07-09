@@ -290,16 +290,22 @@ with col1:
                     st.session_state['user_files'].append(safe_filename)
         st.success(f"✅ {len(uploaded_files)} file(s) uploaded successfully!")
 
-    # Only show files uploaded by this user (or in session if not logged in)
     if username:
-        available_files = [f for f in os.listdir(user_upload_dir) if f.endswith('.csv')]
+        # Add debug info for files in user_upload_dir
+        try:
+            files_in_dir = os.listdir(user_upload_dir)
+        except Exception as e:
+            files_in_dir = []
+            st.warning(f"[DEBUG] Could not list files in {user_upload_dir}: {e}")
+        st.info(f"[DEBUG] Files in {user_upload_dir}: {files_in_dir}")
+        available_files = [f for f in files_in_dir if f.endswith('.csv') and os.path.exists(os.path.join(user_upload_dir, f))]
     else:
         # For guests, always include 'sample.csv' if it exists
         guest_files = [f for f in st.session_state['user_files'] if f.endswith('.csv')]
         if os.path.exists(os.path.join('uploads', 'sample.csv')):
             if 'sample.csv' not in guest_files:
                 guest_files.insert(0, 'sample.csv')
-        available_files = guest_files
+        available_files = [f for f in guest_files if os.path.exists(os.path.join(user_upload_dir, f))]
 
     if available_files:
         # File selection
@@ -325,7 +331,12 @@ with col1:
                     try:
                         # Ensure the upload directory exists before reading
                         os.makedirs(user_upload_dir, exist_ok=True)
-                        df = pd.read_csv(os.path.join(user_upload_dir, filename))
+                        file_path = os.path.join(user_upload_dir, filename)
+                        if not os.path.exists(file_path):
+                            st.warning(f"[DEBUG] File does not exist: {file_path}")
+                            st.error(f"❌ File {filename} does not exist.")
+                            continue
+                        df = pd.read_csv(file_path)
                         
                         # Show basic info
                         col_info1, col_info2, col_info3 = st.columns(3)
