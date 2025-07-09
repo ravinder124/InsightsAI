@@ -23,7 +23,12 @@ class ToolExecutor:
             tool_func = self.tools.get(invocation.tool)
             if tool_func:
                 try:
-                    result = tool_func(**invocation.tool_input)
+                    # Only pass the arguments expected by the tool
+                    if invocation.tool == "complete_python_task":
+                        allowed_args = {k: v for k, v in invocation.tool_input.items() if k in ["graph_state", "thought", "python_code"]}
+                        result = tool_func(**allowed_args)
+                    else:
+                        result = tool_func(**invocation.tool_input)
                     results.append((result, {}))  # Adjust as needed for your return type
                 except Exception as e:
                     if return_exceptions:
