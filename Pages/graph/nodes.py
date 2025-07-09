@@ -138,16 +138,15 @@ def call_tools(state: AgentState):
         for tool_call in last_message.tool_calls:
             tool_name = tool_call["name"]
             tool_args = dict(tool_call["args"])
-            # For complete_python_task, only keep python_code and graph_state, and prepend thought as a comment if present
+            # For complete_python_task, only pass python_code and graph_state, never thought
             if tool_name == "complete_python_task":
                 python_code = tool_args.get("python_code", "")
                 thought = tool_args.get("thought", "")
                 if thought:
                     python_code = f"# Thought: {thought}\n{python_code}"
-                filtered_args = {"python_code": python_code}
+                tool_input = {"python_code": python_code, "graph_state": state}
             else:
-                filtered_args = tool_args
-            tool_input = {**filtered_args, "graph_state": state}
+                tool_input = {**tool_args, "graph_state": state}
             tool_invocations.append(ToolInvocation(tool=tool_name, tool_input=tool_input))
 
     responses = tool_executor.batch(tool_invocations, return_exceptions=True)
