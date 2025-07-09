@@ -7,6 +7,9 @@ from Pages.backend import PythonChatbot, InputData
 import pickle
 import time
 
+# Ensure the parent uploads directory always exists
+os.makedirs('uploads', exist_ok=True)
+
 # Monochromatic Color Palette
 PRIMARY = "#25282b"   # Main dark background
 SECONDARY = "#f8f8f8" # Off-white for contrast
