@@ -15,7 +15,7 @@ class ToolInvocation:
 
 class ToolExecutor:
     def __init__(self, tools):
-        self.tools = {t.__name__: t for t in tools}
+        self.tools = {t.name: t for t in tools}
 
     def batch(self, tool_invocations, return_exceptions=True):
         results = []
