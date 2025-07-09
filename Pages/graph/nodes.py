@@ -145,9 +145,12 @@ def call_tools(state: AgentState):
                 python_code = tool_args.get("python_code", "")
                 if thought:
                     python_code = f"# Thought: {thought}\n{python_code}"
+                # Only pass allowed keys, never pass tool_args directly
                 tool_input = {"python_code": python_code, "graph_state": state}
             else:
-                tool_input = {**tool_args, "graph_state": state}
+                # Remove any unexpected keys for other tools as well
+                allowed_keys = set(["graph_state"]) | set(tool_args.keys())
+                tool_input = {k: v for k, v in {**tool_args, "graph_state": state}.items() if k in allowed_keys}
             tool_invocations.append(ToolInvocation(tool=tool_name, tool_input=tool_input))
 
     responses = tool_executor.batch(tool_invocations, return_exceptions=True)
