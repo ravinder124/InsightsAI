@@ -141,11 +141,11 @@ def call_tools(state: AgentState):
             # Deep copy to ensure no reference to the original dict
             tool_args = copy.deepcopy(tool_call["args"])
             if tool_name == "complete_python_task":
-                thought = tool_args.pop("thought", None)
+                # Only extract python_code, ignore all other keys
                 python_code = tool_args.get("python_code", "")
+                thought = tool_args.get("thought", None)
                 if thought:
                     python_code = f"# Thought: {thought}\n{python_code}"
-                # Only pass allowed keys, never pass tool_args directly
                 tool_input = {"python_code": python_code, "graph_state": state}
             else:
                 # Remove any unexpected keys for other tools as well
