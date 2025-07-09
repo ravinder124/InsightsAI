@@ -6,6 +6,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 from Pages.backend import PythonChatbot, InputData
 import pickle
 import time
+import re
 
 # Ensure the parent uploads directory always exists
 os.makedirs('uploads', exist_ok=True)
@@ -271,18 +272,22 @@ with col1:
     if uploaded_files:
         # Ensure the upload directory exists
         os.makedirs(user_upload_dir, exist_ok=True)
+        st.info(f"[DEBUG] user_upload_dir: {repr(user_upload_dir)} (type: {type(user_upload_dir)})")
         st.info(f"[DEBUG] Saving to: {os.path.abspath(user_upload_dir)}")
         st.info(f"[DEBUG] Directory exists: {os.path.exists(user_upload_dir)}")
         # Save uploaded files and track in session or user folder
         for file in uploaded_files:
-            st.info(f"[DEBUG] About to save file: {file.name}")
-            file_path = os.path.join(user_upload_dir, file.name)
-            st.info(f"[DEBUG] Full file path: {os.path.abspath(file_path)}")
+            st.info(f"[DEBUG] file.name: {repr(file.name)} (type: {type(file.name)})")
+            # Sanitize filename to prevent path traversal or invalid characters
+            safe_filename = re.sub(r'[^A-Za-z0-9_.-]', '_', file.name)
+            st.info(f"[DEBUG] safe_filename: {repr(safe_filename)}")
+            file_path = os.path.join(user_upload_dir, safe_filename)
+            st.info(f"[DEBUG] file_path: {repr(file_path)} (type: {type(file_path)})")
             with open(file_path, "wb") as f:
                 f.write(file.getbuffer())
             if not username:
-                if file.name not in st.session_state['user_files']:
-                    st.session_state['user_files'].append(file.name)
+                if safe_filename not in st.session_state['user_files']:
+                    st.session_state['user_files'].append(safe_filename)
         st.success(f"✅ {len(uploaded_files)} file(s) uploaded successfully!")
 
     # Only show files uploaded by this user (or in session if not logged in)
