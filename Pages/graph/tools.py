@@ -89,7 +89,7 @@ for figure in plotly_figures:
 
 @tool
 def complete_python_task(
-        graph_state: dict, python_code: str, thought: str = ""
+        graph_state: dict, python_code: str, thought: str = "", **kwargs
 ) -> Tuple[str, dict]:
     """Completes a python task
 
