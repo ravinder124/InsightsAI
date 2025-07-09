@@ -4,7 +4,7 @@ langchain-core
 scikit-learn
 plotly
 langchain
-langgraph==0.5.1
+langgraph
 langchain-openai
 numpy
 passlib

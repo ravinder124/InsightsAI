@@ -3,10 +3,10 @@
 __pycache__/
 *.ipynb_checkpoints/
 *.pkl
-*.png
+!*.png
 *.pdf
 *.pickle
 *.pyc
 *.pyo
 *.pyd
-
+.env
