@@ -261,13 +261,20 @@ with col1:
     st.markdown('<div class="themed-card">', unsafe_allow_html=True)
     st.header("📁 Data Management")
     
+    # Ensure user_upload_dir exists before session cleanup
+    if not os.path.exists(user_upload_dir):
+        os.makedirs(user_upload_dir, exist_ok=True)
+    st.info(f"[DEBUG] user_upload_dir before session cleanup: {user_upload_dir}")
     # Clean up session state for uploaded files that no longer exist
     if 'user_files' in st.session_state:
         cleaned_files = []
         for fname in st.session_state['user_files']:
             fpath = os.path.join(user_upload_dir, fname)
+            st.info(f"[DEBUG] Checking file: {fpath}")
             if os.path.exists(fpath):
                 cleaned_files.append(fname)
+            else:
+                st.info(f"[DEBUG] File does not exist: {fpath}")
         st.session_state['user_files'] = cleaned_files
 
     # File upload section
@@ -324,18 +331,26 @@ with col1:
     else:
         # For guests, always include 'sample.csv' if it exists
         guest_files = [f for f in st.session_state['user_files'] if f.endswith('.csv')]
-        if os.path.exists(os.path.join('uploads', 'sample.csv')):
+        sample_csv_path = os.path.join('uploads', 'sample.csv')
+        st.info(f"[DEBUG] Checking for sample.csv at: {sample_csv_path}")
+        st.info(f"[DEBUG] sample.csv exists: {os.path.exists(sample_csv_path)}")
+        if os.path.exists(sample_csv_path):
             if 'sample.csv' not in guest_files:
                 guest_files.insert(0, 'sample.csv')
         # Ensure sample.csv is always included if it exists
         available_files = []
         for f in guest_files:
             if f == 'sample.csv':
-                if os.path.exists(os.path.join('uploads', 'sample.csv')):
+                if os.path.exists(sample_csv_path):
                     available_files.append('sample.csv')
+                else:
+                    st.info(f"[DEBUG] sample.csv not found at: {sample_csv_path}")
             else:
-                if os.path.exists(os.path.join(user_upload_dir, f)):
+                fpath = os.path.join(user_upload_dir, f)
+                if os.path.exists(fpath):
                     available_files.append(f)
+                else:
+                    st.info(f"[DEBUG] Guest file not found: {fpath}")
         st.info(f"[DEBUG] Guest available_files: {available_files}")
 
     if available_files:
