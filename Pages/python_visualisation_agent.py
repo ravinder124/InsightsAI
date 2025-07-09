@@ -261,6 +261,15 @@ with col1:
     st.markdown('<div class="themed-card">', unsafe_allow_html=True)
     st.header("📁 Data Management")
     
+    # Clean up session state for uploaded files that no longer exist
+    if 'user_files' in st.session_state:
+        cleaned_files = []
+        for fname in st.session_state['user_files']:
+            fpath = os.path.join(user_upload_dir, fname)
+            if os.path.exists(fpath):
+                cleaned_files.append(fname)
+        st.session_state['user_files'] = cleaned_files
+
     # File upload section
     uploaded_files = st.file_uploader(
         "Upload CSV files", 
@@ -268,6 +277,19 @@ with col1:
         accept_multiple_files=True,
         help="Select one or more CSV files to analyze"
     )
+
+    # Defensive: If uploaded_files references files that do not exist, reset uploader and prompt re-upload
+    if uploaded_files:
+        import re
+        for file in uploaded_files:
+            safe_filename = re.sub(r'[^A-Za-z0-9_.-]', '_', file.name)
+            file_path = os.path.join(user_upload_dir, safe_filename)
+            if not os.path.exists(user_upload_dir):
+                os.makedirs(user_upload_dir, exist_ok=True)
+            if not os.path.exists(file_path):
+                st.warning(f"File {safe_filename} not found on disk. Please re-upload.")
+                st.session_state['user_files'] = []
+                st.experimental_rerun()
 
     if uploaded_files:
         # Ensure the upload directory exists
