@@ -9,7 +9,8 @@ load_dotenv()
 import os
 
 api_key = os.getenv("OPENAI_API_KEY")
-st.info(f"[DEBUG] OPENAI_API_KEY: {os.getenv('OPENAI_API_KEY')}")
+# Remove the debug print for OPENAI_API_KEY
+# st.info(f"[DEBUG] OPENAI_API_KEY: {os.getenv('OPENAI_API_KEY')}")
 # Monochromatic Color Palette
 PRIMARY = "#25282b"   # Main dark background
 SECONDARY = "#f8f8f8" # Off-white for contrast
