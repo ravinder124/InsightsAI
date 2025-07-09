@@ -27,9 +27,9 @@ class ToolExecutor:
                     # Only pass the arguments expected by the tool
                     if invocation.tool == "complete_python_task":
                         tool_input = invocation.tool_input
-                        result = tool_func(**tool_input)
+                        result = tool_func.invoke(tool_input)
                     else:
-                        result = tool_func(**invocation.tool_input)
+                        result = tool_func.invoke(invocation.tool_input)
                     results.append((result, {}))  # Adjust as needed for your return type
                 except Exception as e:
                     if return_exceptions:
