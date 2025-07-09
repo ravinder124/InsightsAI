@@ -9,3 +9,4 @@ langchain-openai
 numpy
 passlib
 bcrypt
+python-dotenv
