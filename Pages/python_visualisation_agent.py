@@ -296,7 +296,7 @@ with col1:
             if not os.path.exists(file_path):
                 st.warning(f"File {safe_filename} not found on disk. Please re-upload.")
                 st.session_state['user_files'] = []
-                st.experimental_rerun()
+                st.rerun()
 
     if uploaded_files:
         # Ensure the upload directory exists
