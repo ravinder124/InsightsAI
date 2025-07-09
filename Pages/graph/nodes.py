@@ -6,6 +6,7 @@ import json
 from typing import Literal
 from .tools import complete_python_task
 # from langgraph.prebuilt import ToolInvocation, ToolExecutor
+import copy
 
 # Minimal local replacements for ToolInvocation and ToolExecutor
 class ToolInvocation:
@@ -137,8 +138,8 @@ def call_tools(state: AgentState):
     if isinstance(last_message, AIMessage) and hasattr(last_message, 'tool_calls'):
         for tool_call in last_message.tool_calls:
             tool_name = tool_call["name"]
-            tool_args = dict(tool_call["args"])
-            # For complete_python_task, remove 'thought' from tool_args if present
+            # Deep copy to ensure no reference to the original dict
+            tool_args = copy.deepcopy(tool_call["args"])
             if tool_name == "complete_python_task":
                 thought = tool_args.pop("thought", None)
                 python_code = tool_args.get("python_code", "")
