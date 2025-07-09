@@ -5,7 +5,34 @@ from .state import AgentState, serialize_state
 import json
 from typing import Literal
 from .tools import complete_python_task
-from langgraph.prebuilt import ToolInvocation, ToolExecutor
+# from langgraph.prebuilt import ToolInvocation, ToolExecutor
+
+# Minimal local replacements for ToolInvocation and ToolExecutor
+class ToolInvocation:
+    def __init__(self, tool, tool_input):
+        self.tool = tool
+        self.tool_input = tool_input
+
+class ToolExecutor:
+    def __init__(self, tools):
+        self.tools = {t.__name__: t for t in tools}
+
+    def batch(self, tool_invocations, return_exceptions=True):
+        results = []
+        for invocation in tool_invocations:
+            tool_func = self.tools.get(invocation.tool)
+            if tool_func:
+                try:
+                    result = tool_func(**invocation.tool_input)
+                    results.append((result, {}))  # Adjust as needed for your return type
+                except Exception as e:
+                    if return_exceptions:
+                        results.append(e)
+                    else:
+                        raise
+            else:
+                results.append(Exception(f"Tool {invocation.tool} not found"))
+        return results
 import os
 
 
