@@ -138,10 +138,10 @@ def call_tools(state: AgentState):
         for tool_call in last_message.tool_calls:
             tool_name = tool_call["name"]
             tool_args = dict(tool_call["args"])
-            # For complete_python_task, only pass python_code and graph_state, never thought
+            # For complete_python_task, remove 'thought' from tool_args if present
             if tool_name == "complete_python_task":
+                thought = tool_args.pop("thought", None)
                 python_code = tool_args.get("python_code", "")
-                thought = tool_args.get("thought", "")
                 if thought:
                     python_code = f"# Thought: {thought}\n{python_code}"
                 tool_input = {"python_code": python_code, "graph_state": state}
