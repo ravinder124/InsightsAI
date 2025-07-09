@@ -268,9 +268,13 @@ with col1:
     if uploaded_files:
         # Ensure the upload directory exists
         os.makedirs(user_upload_dir, exist_ok=True)
+        st.info(f"[DEBUG] Saving to: {os.path.abspath(user_upload_dir)}")
+        st.info(f"[DEBUG] Directory exists: {os.path.exists(user_upload_dir)}")
         # Save uploaded files and track in session or user folder
         for file in uploaded_files:
+            st.info(f"[DEBUG] About to save file: {file.name}")
             file_path = os.path.join(user_upload_dir, file.name)
+            st.info(f"[DEBUG] Full file path: {os.path.abspath(file_path)}")
             with open(file_path, "wb") as f:
                 f.write(file.getbuffer())
             if not username:
