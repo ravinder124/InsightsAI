@@ -39,6 +39,8 @@ class PythonChatbot:
         self.chat_history = result["messages"]
         new_image_paths = set(result["output_image_paths"]) - starting_image_paths_set
         self.output_image_paths[len(self.chat_history) - 1] = list(new_image_paths)
+        print("[DEBUG] output_image_paths mapping:", self.output_image_paths)
+        print("[DEBUG] chat_history length:", len(self.chat_history))
         if "intermediate_outputs" in result:
             self.intermediate_outputs.extend(result["intermediate_outputs"])
 
