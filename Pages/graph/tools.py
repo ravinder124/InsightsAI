@@ -92,7 +92,7 @@ class PythonTaskInput(BaseModel):
     thought: str = ""
     python_code: str = ""
 
-@tool(args_schema=PythonTaskInput)
+@tool
 def complete_python_task(
         thought: str = "", python_code: str = "", graph_state: dict = None, **kwargs
 ) -> Tuple[str, dict]:
