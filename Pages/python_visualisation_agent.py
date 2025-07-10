@@ -504,6 +504,20 @@ with col2:
     
     st.markdown('</div>', unsafe_allow_html=True)
 
+# === Debug: Display all pickle files below chat ===
+pickle_dir = "images/plotly_figures/pickle"
+if os.path.exists(pickle_dir):
+    files = os.listdir(pickle_dir)
+    if files:
+        st.markdown("### All Pickle Files (Debug)")
+        for f in files:
+            try:
+                with open(os.path.join(pickle_dir, f), "rb") as pf:
+                    fig = pickle.load(pf)
+                st.plotly_chart(fig, use_container_width=True, key=f"all_pickle_{f}")
+            except Exception as e:
+                st.error(f"Error loading plot {f}: {str(e)}")
+
 # === Debug: List Pickle Files in Sidebar ===
 pickle_dir = "images/plotly_figures/pickle"
 with st.sidebar:
