@@ -502,6 +502,21 @@ with col2:
     
     st.markdown('</div>', unsafe_allow_html=True)
 
+# === Debug: List Pickle Files in Sidebar ===
+pickle_dir = "images/plotly_figures/pickle"
+with st.sidebar:
+    st.markdown("### 🗂️ Pickle Files (Debug)")
+    if os.path.exists(pickle_dir):
+        files = os.listdir(pickle_dir)
+        if files:
+            st.write(f"Found {len(files)} pickle file(s):")
+            for f in files:
+                st.write(f)
+        else:
+            st.write("No pickle files found.")
+    else:
+        st.write("Pickle directory does not exist.")
+
 # Remove the always-visible Debug tab and info section
 # Only show debug info if there are intermediate_outputs
 if 'visualisation_chatbot' in st.session_state and hasattr(st.session_state.visualisation_chatbot, 'intermediate_outputs') and st.session_state.visualisation_chatbot.intermediate_outputs:
