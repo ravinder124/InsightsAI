@@ -474,6 +474,7 @@ with col2:
                 st.markdown('</div>', unsafe_allow_html=True)
             else:
                 # Display chat history with associated images
+                ai_msg_counter = 0
                 for msg_index, msg in enumerate(st.session_state.visualisation_chatbot.chat_history):
                     if isinstance(msg, HumanMessage):
                         with st.chat_message("user"):
@@ -481,16 +482,17 @@ with col2:
                     elif isinstance(msg, AIMessage):
                         with st.chat_message("assistant"):
                             st.markdown(msg.content)
-                            # Display associated plots if they exist
-                            if msg_index in st.session_state.visualisation_chatbot.output_image_paths:
-                                image_paths = st.session_state.visualisation_chatbot.output_image_paths[msg_index]
+                            # Use ai_msg_counter for mapping
+                            if ai_msg_counter in st.session_state.visualisation_chatbot.output_image_paths:
+                                image_paths = st.session_state.visualisation_chatbot.output_image_paths[ai_msg_counter]
                                 for image_path in image_paths:
                                     try:
                                         with open(os.path.join("images/plotly_figures/pickle", image_path), "rb") as f:
                                             fig = pickle.load(f)
-                                        st.plotly_chart(fig, use_container_width=True, key=f"plotly_chart_{msg_index}_{image_path}")
+                                        st.plotly_chart(fig, use_container_width=True, key=f"plotly_chart_{ai_msg_counter}_{image_path}")
                                     except Exception as e:
                                         st.error(f"Error loading plot: {str(e)}")
+                        ai_msg_counter += 1
         # Chat input
         st.chat_input(
             placeholder="💭 Ask me anything about your data...",
@@ -516,6 +518,12 @@ with st.sidebar:
             st.write("No pickle files found.")
     else:
         st.write("Pickle directory does not exist.")
+    # Debug: Output Image Paths Mapping and Chat History Length
+    st.markdown("### 🗂️ Output Image Paths Mapping (Debug)")
+    if 'visualisation_chatbot' in st.session_state:
+        st.write(st.session_state.visualisation_chatbot.output_image_paths)
+        st.markdown("### 🗂️ Chat History Length (Debug)")
+        st.write(len(st.session_state.visualisation_chatbot.chat_history))
 
 # Remove the always-visible Debug tab and info section
 # Only show debug info if there are intermediate_outputs
