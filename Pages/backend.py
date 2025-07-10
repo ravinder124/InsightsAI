@@ -1,4 +1,4 @@
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AIMessage
 from typing import List
 from dataclasses import dataclass
 from langgraph.graph import StateGraph
@@ -38,7 +38,11 @@ class PythonChatbot:
         result = self.graph.invoke(input_state, {"recursion_limit": 25})
         self.chat_history = result["messages"]
         new_image_paths = set(result["output_image_paths"]) - starting_image_paths_set
-        self.output_image_paths[len(self.chat_history) - 1] = list(new_image_paths)
+        # Map new image paths to the last AIMessage index
+        ai_msg_indices = [i for i, msg in enumerate(self.chat_history) if isinstance(msg, AIMessage)]
+        if ai_msg_indices:
+            last_ai_index = ai_msg_indices[-1]
+            self.output_image_paths[last_ai_index] = list(new_image_paths)
         print("[DEBUG] output_image_paths mapping:", self.output_image_paths)
         print("[DEBUG] chat_history length:", len(self.chat_history))
         if "intermediate_outputs" in result:
