@@ -513,10 +513,22 @@ if os.path.exists(pickle_dir):
         for f in files:
             try:
                 with open(os.path.join(pickle_dir, f), "rb") as pf:
-                    fig = pickle.load(pf)
-                st.plotly_chart(fig, use_container_width=True, key=f"all_pickle_{f}")
+                    obj = pickle.load(pf)
+                st.write(f"File: {f}, Type: {type(obj)}")
+                if hasattr(obj, 'to_dict'):
+                    st.write("Plotly Figure keys:", list(obj.to_dict().keys()))
+                st.plotly_chart(obj, use_container_width=True, key=f"all_pickle_{f}")
             except Exception as e:
                 st.error(f"Error loading plot {f}: {str(e)}")
+
+# === Debug: Direct Plotly Chart Test ===
+import plotly.express as px
+import pandas as pd
+
+df = pd.DataFrame({'x': [1, 2, 3], 'y': [4, 1, 2]})
+fig = px.line(df, x='x', y='y', title='Test Line Chart')
+st.markdown('### Direct Plotly Chart Test')
+st.plotly_chart(fig, use_container_width=True)
 
 # === Debug: List Pickle Files in Sidebar ===
 pickle_dir = "images/plotly_figures/pickle"
